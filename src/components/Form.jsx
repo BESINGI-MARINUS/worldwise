@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
+import { useCities } from "../contexts/CitiesProvider";
+import "react-datepicker/dist/react-datepicker.css";
 
 import convertToEmoji from "../utils/convertToEmoji";
 import styles from "./Form.module.css";
 import Button from "./Button";
 import { useNavigate } from "react-router-dom";
 import { useUrlLocation } from "../hooks/useUrlLocation";
-import { useCities } from "../contexts/CitiesProvider";
 import Message from "./Message";
 import Spinner from "./Spinner";
 
@@ -15,19 +17,17 @@ function Form() {
   const [cityName, setCityName] = useState("");
   const [country, setCountry] = useState("");
   const [date, setDate] = useState(new Date());
-  const { formatDate } = useCities();
   const [notes, setNotes] = useState("");
   const navigate = useNavigate();
   const [lat, lng] = useUrlLocation();
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [countryCode, setCountryCode] = useState("");
+  const { createCity, isLoading } = useCities();
 
   useEffect(
     function () {
       async function getCity() {
         try {
-          setIsLoading(true);
           setError("");
 
           const res = await fetch(
@@ -43,8 +43,6 @@ function Form() {
           setCountryCode(data.countryCode);
         } catch (error) {
           setError(error.message);
-        } finally {
-          setIsLoading(false);
         }
       }
 
@@ -52,6 +50,22 @@ function Form() {
     },
     [lat, lng],
   );
+
+  function handleAddCity(e) {
+    e.preventDefault();
+    if (!cityName || !date) return setError("City and date are required!");
+
+    const newCity = {
+      cityName,
+      country,
+      emoji: countryCode,
+      date,
+      notes,
+      position: { lat, lng },
+    };
+
+    createCity(newCity);
+  }
 
   if (isLoading) return <Spinner />;
   if (error) return <Message message={error} type="error" />;
@@ -69,10 +83,11 @@ function Form() {
 
       <div className={styles.row}>
         <label htmlFor="date">When did you go to {cityName}?</label>
-        <input
+        <DatePicker
           id="date"
-          onChange={(e) => setDate(e.target.value)}
-          value={formatDate(date)}
+          onChange={(date) => setDate(date)}
+          selected={date}
+          dateFormat="dd-MM-yyyy"
         />
       </div>
 
@@ -86,7 +101,9 @@ function Form() {
       </div>
 
       <div className={styles.buttons}>
-        <Button type="primary">Add</Button>
+        <Button type="primary" onClick={(e) => handleAddCity(e)}>
+          Add
+        </Button>
         <Button
           type="back"
           onClick={(e) => {

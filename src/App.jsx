@@ -1,11 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
-// import ProductPage from "./pages/ProductPage";
-// import PricingPage from "./pages/PricingPage";
-// import Homepage from "./pages/Homepage";
-// import AppPage from "./pages/AppLayout";
-// import PageNotFound from "./pages/PageNotFound";
-// import Login from "./pages/Login";
 import CityList from "./components/CityList";
 import CountryList from "./components/CountryList";
 import City from "./components/City";
@@ -58,9 +52,3 @@ function App() {
 }
 
 export default App;
-
-// vite v4.5.14 building for production...
-// ✓ 446 modules transformed.
-// dist/index.html                   0.48 kB │ gzip:   0.31 kB
-// dist/assets/index-a2b2dd58.css   31.38 kB │ gzip:   5.22 kB
-// dist/assets/index-98b59892.js   536.66 kB │ gzip: 157.31 kB
